@@ -3,9 +3,7 @@ frontend/node_modules/
 **/node_modules/
 
 # Dockerfiles (root + backend + frontend)
-Dockerfile
-backend/Dockerfile
-frontend/Dockerfile
+
 
 # Logs / build artifacts
 frontend/dist/
