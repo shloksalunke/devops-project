@@ -20,7 +20,7 @@ services:
       args:
         - VITE_API_BASE_URL=/api
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/nmride
+    - DATABASE_URL=postgresql://postgres:postgres@db:5432/nmride
     depends_on:
       db:
         condition: service_healthy
