@@ -88,8 +88,6 @@ def login(db: Session, email: str, password: str) -> tuple:
     if driver:
         if not verify_password(password, driver.hashed_password):
             raise UnauthorizedError("Invalid email or password")
-        if not driver.is_active:
-            raise UnauthorizedError("Driver is inactive")
 
         access_token = create_access_token({"sub": str(driver.id), "type": "driver"})
         refresh_token = create_refresh_token({"sub": str(driver.id), "type": "driver"})
@@ -111,8 +109,8 @@ def refresh_access_token(db: Session, refresh_token: str) -> TokenResponse:
         new_access_token = create_access_token({"sub": str(user.id), "type": "user"})
     elif user_type == "driver":
         driver = driver_repo.get_by_id(db, user_id)
-        if not driver or not driver.is_active:
-            raise UnauthorizedError("Driver not found or inactive")
+        if not driver:
+            raise UnauthorizedError("Driver not found")
         new_access_token = create_access_token({"sub": str(driver.id), "type": "driver"})
     else:
         raise UnauthorizedError("Invalid token type")

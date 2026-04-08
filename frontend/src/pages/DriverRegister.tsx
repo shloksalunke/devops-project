@@ -249,7 +249,7 @@ const DriverRegister: React.FC = () => {
           <div>
             <label className="block text-sm font-medium mb-1">Service Area</label>
             <input
-              placeholder="e.g., Mumbai - Bandra, Worli"
+              placeholder="e.g., SawalDe, Nardana Railway Station, Shirpur"
               value={form.service_area}
               onChange={e => set('service_area', e.target.value)}
               className="w-full rounded-md border px-3 py-2 text-sm"

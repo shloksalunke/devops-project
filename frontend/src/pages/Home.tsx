@@ -8,18 +8,14 @@ import { MapPin, Navigation } from 'lucide-react';
 
 const vehicleFilters = ['All', 'Auto', 'Taxi', 'Car'] as const;
 
-// Common service areas
-const serviceAreas = [
-  'Nashik Road',
-  'CBS to College Road',
-  'Panchvati',
-  'Gangapur Road',
-  'Dwarka Circle',
-  'College Road',
-  'Trimbak Road',
-  'Satpur MIDC',
-  'Nashik City',
-  'Old Town',
+const pickupAreas = [
+  'NMIMS Shirpur Campus',
+] as const;
+
+const destinationAreas = [
+  'SawalDe',
+  'Nardana Railway Station',
+  'Shirpur',
 ] as const;
 
 const Home: React.FC = () => {
@@ -36,13 +32,30 @@ const Home: React.FC = () => {
       setLoading(true);
       const { data } = await driversApi.getAll();
       
-      // Filter by service area if pickup area is selected
       let filtered = data;
-      if (pickup) {
-        filtered = filtered.filter(d => 
-          d.service_area?.toLowerCase().includes(pickup.toLowerCase()) ||
-          pickup.toLowerCase().includes(d.service_area?.toLowerCase() || '')
-        );
+      if (pickup || destination) {
+        filtered = filtered.filter(d => {
+          const area = d.service_area?.toLowerCase() || '';
+          
+          let matchesPickup = true;
+          if (pickup) {
+            matchesPickup = area.includes(pickup.toLowerCase()) || pickup.toLowerCase().includes(area);
+          }
+          
+          let matchesDest = true;
+          if (destination) {
+            matchesDest = area.includes(destination.toLowerCase()) || destination.toLowerCase().includes(area);
+          }
+
+          // If they selected both, require both to match (if the driver wrote "NMIMS, Shirpur").
+          // However, if the matching is too strict, they'll see no drivers. Let's do OR logic:
+          // If the driver serves the pickup area OR destination area, show them.
+          if (pickup && destination) {
+             return matchesPickup || matchesDest;
+          }
+          
+          return matchesPickup && matchesDest;
+        });
       }
       
       setDrivers(filtered);
@@ -97,7 +110,7 @@ const Home: React.FC = () => {
                   className="w-full rounded-md border border-input bg-card py-2 pl-9 pr-3 text-sm text-foreground outline-none transition-colors duration-150 focus:border-accent"
                 >
                   <option value="">Select pickup area...</option>
-                  {serviceAreas.map((area) => (
+                  {pickupAreas.map((area) => (
                     <option key={area} value={area}>
                       {area}
                     </option>
@@ -116,7 +129,7 @@ const Home: React.FC = () => {
                   className="w-full rounded-md border border-input bg-card py-2 pl-9 pr-3 text-sm text-foreground outline-none transition-colors duration-150 focus:border-accent"
                 >
                   <option value="">Select destination...</option>
-                  {serviceAreas.map((area) => (
+                  {destinationAreas.map((area) => (
                     <option key={area} value={area}>
                       {area}
                     </option>
@@ -127,7 +140,10 @@ const Home: React.FC = () => {
 
             <div className="flex flex-col justify-end gap-2">
               <button
-                onClick={() => setPickupArea('')}
+                onClick={() => {
+                  setPickupArea('');
+                  setDestinationArea('');
+                }}
                 className="rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground transition-colors duration-150 hover:bg-muted"
               >
                 Clear

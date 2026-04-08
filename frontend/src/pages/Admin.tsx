@@ -156,10 +156,11 @@ const Admin: React.FC = () => {
   const handleDownloadDocument = async (docId: string, fileName: string) => {
     try {
       if (!selectedDriver) return;
-      const token = localStorage.getItem('token');
-      
+      const token = localStorage.getItem('campusride_token');
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
       const response = await fetch(
-        `http://localhost:8000/admin/drivers/${selectedDriver.id}/documents/${docId}/download`,
+        `${baseUrl}/admin/drivers/${selectedDriver.id}/documents/${docId}/download`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -557,7 +558,7 @@ const Admin: React.FC = () => {
               <p className="text-xs font-semibold text-blue-900 mb-1">Verification Status</p>
               <div className="text-xs text-blue-800 space-y-0.5">
                 <p>Documents: {verificationStatus.documents.length} submitted</p>
-                <p>Status: {verificationStatus.all_required_approved ? '✅ Ready to Approve' : '❌ Incomplete'}</p>
+                <p>Status: {verificationStatus.documents.length > 0 ? '✅ Ready to Review' : '❌ No Documents'}</p>
               </div>
             </div>
 
@@ -577,7 +578,7 @@ const Admin: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={handleApprove}
-                  disabled={submitting || !verificationStatus.all_required_approved}
+                  disabled={submitting || verificationStatus.documents.length === 0}
                   className="flex-1 flex items-center justify-center gap-1 rounded-md bg-green-600 px-3 py-2 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   <CheckCircle size={14} />

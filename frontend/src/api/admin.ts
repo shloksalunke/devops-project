@@ -78,8 +78,8 @@ export const adminApi = {
     client.get<DriverDocument[]>(`/admin/drivers/${driverId}/documents`),
   
   downloadDocument: (driverId: string, documentId: string) => {
-    // Create download link
-    return `http://localhost:8000/admin/drivers/${driverId}/documents/${documentId}/download`;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    return `${baseUrl}/admin/drivers/${driverId}/documents/${documentId}/download`;
   },
   
   approveDriver: (driverId: string, notes?: string) =>

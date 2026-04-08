@@ -11,3 +11,9 @@ frontend/dist/
 
 # Python venv
 backend/venv/
+
+# Environment and IDE files
+.env
+.env.*
+!.env.example
+.claude/

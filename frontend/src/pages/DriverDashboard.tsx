@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { driverApi } from '@/api/driver';
+import { driverApi, VerificationStatus, DriverDocument } from '@/api/driver';
 import Navbar from '@/components/Navbar';
 import { useToastNotify } from '@/components/ToastNotify';
-import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, FileText, Download, XCircle } from 'lucide-react';
 import Badge from '@/components/Badge';
 
 interface DriverStats {
@@ -28,6 +28,8 @@ const DriverDashboard: React.FC = () => {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
+  const [loadingVerification, setLoadingVerification] = useState(true);
   const { showToast } = useToastNotify();
 
   const toggle = async () => {
@@ -75,8 +77,30 @@ const DriverDashboard: React.FC = () => {
     }
   };
 
+  const fetchVerificationStatus = async () => {
+    try {
+      const { data } = await driverApi.getVerificationStatus();
+      setVerificationStatus(data);
+    } catch (error) {
+      console.error('Failed to fetch verification status:', error);
+    } finally {
+      setLoadingVerification(false);
+    }
+  };
+
+  const handleDownloadDocument = (doc: DriverDocument) => {
+    const url = driverApi.getDocumentDownloadUrl(doc.id);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = doc.file_name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     fetchStats();
+    fetchVerificationStatus();
   }, []);
 
   // Auto-refresh every 5 seconds
@@ -109,6 +133,92 @@ const DriverDashboard: React.FC = () => {
           <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">Manage your availability and view your stats</p>
         </div>
+
+        {/* Verification Status Card */}
+        {!loadingVerification && verificationStatus && (
+          <div className={`mb-6 rounded-lg border-2 p-6 ${
+            verificationStatus.verification_status === 'APPROVED'
+              ? 'border-success/50 bg-success/5'
+              : verificationStatus.verification_status === 'REJECTED'
+              ? 'border-destructive/50 bg-destructive/5'
+              : 'border-yellow-500/50 bg-yellow-50'
+          }`}>
+            <div className="flex items-center gap-3">
+              {verificationStatus.verification_status === 'APPROVED' ? (
+                <CheckCircle size={24} className="text-success" />
+              ) : verificationStatus.verification_status === 'REJECTED' ? (
+                <XCircle size={24} className="text-destructive" />
+              ) : (
+                <Clock size={24} className="text-yellow-600" />
+              )}
+              <div>
+                <h2 className="text-sm font-medium text-muted-foreground">Verification Status</h2>
+                <p className={`text-lg font-bold ${
+                  verificationStatus.verification_status === 'APPROVED'
+                    ? 'text-success'
+                    : verificationStatus.verification_status === 'REJECTED'
+                    ? 'text-destructive'
+                    : 'text-yellow-700'
+                }`}>
+                  {verificationStatus.verification_status === 'APPROVED' && 'Verified ✓'}
+                  {verificationStatus.verification_status === 'REJECTED' && 'Rejected'}
+                  {verificationStatus.verification_status === 'PENDING' && 'Pending Verification'}
+                  {verificationStatus.verification_status === 'SUBMITTED' && 'Submitted - Awaiting Review'}
+                </p>
+              </div>
+            </div>
+
+            {/* Documents Section */}
+            {verificationStatus.documents.length > 0 && (
+              <div className="mt-4">
+                <h3 className="mb-2 text-sm font-semibold text-foreground">Your Documents</h3>
+                <div className="space-y-2">
+                  {verificationStatus.documents.map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between rounded border border-border bg-card p-3">
+                      <div className="flex items-center gap-2">
+                        <FileText size={16} className="text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{doc.document_type}</p>
+                          <p className="text-xs text-muted-foreground">{doc.file_name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          doc.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                          doc.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {doc.status}
+                        </span>
+                        <button
+                          onClick={() => handleDownloadDocument(doc)}
+                          className="rounded p-1 hover:bg-secondary"
+                          title="Download document"
+                        >
+                          <Download size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {verificationStatus.documents.length === 0 && (
+              <p className="mt-3 text-sm text-muted-foreground">No documents uploaded yet.</p>
+            )}
+
+            {verificationStatus.verification_status !== 'APPROVED' && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                {verificationStatus.verification_status === 'PENDING'
+                  ? 'Your documents are being reviewed by our admin team.'
+                  : verificationStatus.verification_status === 'REJECTED'
+                  ? 'Please contact support for more information.'
+                  : 'Please complete your registration to get verified.'}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Availability Toggle */}
         <div className={`mb-6 rounded-lg border-2 p-6 transition-colors duration-150 ${
@@ -150,6 +260,88 @@ const DriverDashboard: React.FC = () => {
               : 'You are offline. Turn on availability to accept ride requests'}
           </p>
         </div>
+
+        {/* Verification Status Card */}
+        {!loadingVerification && verificationStatus && (
+          <div className={`mb-6 rounded-lg border-2 p-6 ${
+            verificationStatus.verification_status === 'APPROVED'
+              ? 'border-success/50 bg-success/5'
+              : verificationStatus.verification_status === 'REJECTED'
+              ? 'border-destructive/50 bg-destructive/5'
+              : 'border-yellow-500/50 bg-yellow-50'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {verificationStatus.verification_status === 'APPROVED' ? (
+                  <CheckCircle size={24} className="text-success" />
+                ) : verificationStatus.verification_status === 'REJECTED' ? (
+                  <XCircle size={24} className="text-destructive" />
+                ) : (
+                  <Clock size={24} className="text-yellow-600" />
+                )}
+                <div>
+                  <h2 className="text-sm font-medium text-muted-foreground">Verification Status</h2>
+                  <p className={`text-2xl font-bold ${
+                    verificationStatus.verification_status === 'APPROVED'
+                      ? 'text-success'
+                      : verificationStatus.verification_status === 'REJECTED'
+                      ? 'text-destructive'
+                      : 'text-yellow-700'
+                  }`}>
+                    {verificationStatus.verification_status === 'APPROVED' && 'Verified ✓'}
+                    {verificationStatus.verification_status === 'REJECTED' && 'Rejected ✗'}
+                    {verificationStatus.verification_status === 'PENDING' && 'Pending Review'}
+                    {verificationStatus.verification_status === 'DRAFT' && 'Not Submitted'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Documents List */}
+            {verificationStatus.documents.length > 0 && (
+              <div className="mt-4">
+                <h3 className="mb-2 text-sm font-medium text-foreground">Your Documents</h3>
+                <div className="space-y-2">
+                  {verificationStatus.documents.map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between rounded border border-border bg-background p-3">
+                      <div className="flex items-center gap-3">
+                        <FileText size={16} className="text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{doc.document_type}</p>
+                          <p className="text-xs text-muted-foreground">{doc.file_name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`rounded px-2 py-1 text-xs font-medium ${
+                          doc.status === 'APPROVED'
+                            ? 'bg-green-100 text-green-800'
+                            : doc.status === 'REJECTED'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {doc.status}
+                        </span>
+                        <button
+                          onClick={() => handleDownloadDocument(doc)}
+                          className="rounded p-1 hover:bg-secondary"
+                          title="Download document"
+                        >
+                          <Download size={16} className="text-muted-foreground" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {verificationStatus.documents.length === 0 && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                No documents uploaded yet. Please contact support if you need to upload documents.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Stats Grid */}
         {stats && (

@@ -33,8 +33,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         driver = get_driver_by_id(db, user_id)
         if not driver:
             raise UnauthorizedError("Driver not found")
-        if not driver.is_active:
-            raise UnauthorizedError("Driver is inactive")
         driver.role = "driver"
         return driver
 

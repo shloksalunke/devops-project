@@ -239,9 +239,10 @@ def approve_driver(db: Session, driver_id: UUID, admin_id: UUID, notes: str | No
     if not driver:
         raise NotFoundError("Driver not found")
     
-    # Check if all required documents are approved
-    if not driver_document_repo.all_approved(db, driver_id):
-        raise BadRequestError("Not all required documents are approved")
+    # Auto-approve all pending documents since the admin has approved the driver
+    docs = driver_document_repo.get_pending_for_driver(db, driver_id)
+    for doc in docs:
+        driver_document_repo.approve(db, doc.id, admin_id)
     
     # Update driver status
     now = datetime.now(timezone.utc)
