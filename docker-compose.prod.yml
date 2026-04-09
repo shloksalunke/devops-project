@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: nmride
+      POSTGRES_DB: campusride
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
@@ -17,10 +17,17 @@ services:
   api:
     build:
       context: ./backend
-      args:
-        - VITE_API_BASE_URL=/api
     environment:
-    - DATABASE_URL=postgresql://postgres:postgres@db:5432/nmride
+      - APP_NAME=CampusRide
+      - APP_ENV=production
+      - DEBUG=False
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/campusride
+      - SECRET_KEY=campusride-dev-secret-key-change-in-production-2024
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - ALLOWED_ORIGINS=["http://localhost","http://localhost:80"]
+      - RATE_LIMIT_PER_MINUTE=60
     depends_on:
       db:
         condition: service_healthy
