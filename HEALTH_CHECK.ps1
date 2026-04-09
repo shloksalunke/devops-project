@@ -27,7 +27,7 @@ Write-Host ""
 Write-Host "3. Testing Login Endpoint" -ForegroundColor Yellow
 try {
     $loginData = @{
-        email = "admin@nm-ride.com"
+        email = "admin@campusride.com"
         password = "Admin@123"
     } | ConvertTo-Json
     
@@ -85,7 +85,7 @@ Write-Host ""
 Write-Host "5. Testing Admin Pending Drivers Endpoint" -ForegroundColor Yellow
 try {
     $adminLoginData = @{
-        email = "admin@nm-ride.com"
+        email = "admin@campusride.com"
         password = "Admin@123"
     } | ConvertTo-Json
     
@@ -119,7 +119,7 @@ Write-Host "6. Database Status" -ForegroundColor Yellow
 try {
     # Try to get any user to verify DB connection
     $adminLoginData = @{
-        email = "admin@nm-ride.com"
+        email = "admin@campusride.com"
         password = "Admin@123"
     } | ConvertTo-Json
     

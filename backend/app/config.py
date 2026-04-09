@@ -4,7 +4,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "NM-Ride"
+    APP_NAME: str = "CampusRide"
     APP_ENV: str = "development"
     DEBUG: bool = False
     DATABASE_URL: str

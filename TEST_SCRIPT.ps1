@@ -42,7 +42,7 @@ try {
 Write-Host "[TEST 2/8] Admin Login" -ForegroundColor Yellow
 try {
     $loginData = @{
-        email = "admin@nm-ride.com"
+        email = "admin@campusride.com"
         password = "Admin@123"
     } | ConvertTo-Json
     

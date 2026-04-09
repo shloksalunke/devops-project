@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: nmride
+      POSTGRES_DB: campusride
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:

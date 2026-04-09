@@ -7,7 +7,7 @@ $licenseContent = "Test Driving License"
 $rcContent = "Test RC Document"
 
 # Write to temporary files
-$tmpDir = "$env:TEMP\nmride_test"
+$tmpDir = "$env:TEMP\campusride_test"
 mkdir -Force $tmpDir | Out-Null
 
 $idFile = "$tmpDir\id.txt"
@@ -21,7 +21,7 @@ Set-Content -Path $rcFile -Value $rcContent
 $form = @{
     name = "Test Driver"
     phone = "9876543210"
-    email = "testdriver@nm-ride.com"
+    email = "testdriver@campusride.com"
     password = "Driver@123"
     vehicle_type = "auto"
     vehicle_details = "DL-01-AB-1234"

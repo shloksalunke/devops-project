@@ -10,6 +10,8 @@ from app.config import settings
 from app.exceptions import register_exception_handlers
 from app.middleware import RequestIDMiddleware, TimingMiddleware
 from app.routers import auth, users, drivers, admin, driver_portal
+from app.database import engine
+from sqlalchemy import text
 
 
 # Configure logging
@@ -21,6 +23,12 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Lifespan context manager for app startup and shutdown."""
     logger.info(f"Starting {settings.APP_NAME} in {settings.APP_ENV} mode")
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+            logger.info("Database connection established successfully!")
+    except Exception as e:
+        logger.error(f"Failed to connect to database: {e}")
     yield
     logger.info(f"Shutting down {settings.APP_NAME}")
 
@@ -29,7 +37,7 @@ def create_app() -> FastAPI:
     """Application factory function."""
     app = FastAPI(
         title=settings.APP_NAME,
-        description="NM-Ride shared transport and ride-sharing management API",
+        description="CampusRide shared transport and ride-sharing management API",
         version="1.0.0",
         docs_url="/docs" if settings.DEBUG else None,
         redoc_url="/redoc" if settings.DEBUG else None,

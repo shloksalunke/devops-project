@@ -92,7 +92,7 @@ WHERE driver_id = (SELECT id FROM drivers WHERE email = 'testdriver001@example.c
 2. Go to: http://localhost:3000/login
 
 3. Enter credentials:
-   - Email: admin@nm-ride.com
+   - Email: admin@campusride.com
    - Password: Admin@123
 
 4. Click "Login"
@@ -350,7 +350,7 @@ Check these metrics:
 
 ### Test 1: Invalid Credentials
 ```
-1. Try: admin@nm-ride.com / WrongPassword
+1. Try: admin@campusride.com / WrongPassword
 Expected: ❌ "Login failed" error shown
 ```
 

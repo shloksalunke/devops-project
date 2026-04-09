@@ -1,6 +1,6 @@
-# NM-Ride Database Schema
+# CampusRide Database Schema
 
-## Database: nmride
+## Database: campusride
 
 ### Users Table
 
@@ -142,7 +142,7 @@ Driver Documents
 INSERT INTO users (name, email, hashed_password, role, is_active) VALUES
 ('Aarav Mehta', 'aarav@student.edu', 'bcrypt_hash', 'student', true),
 ('Priya Sharma', 'priya@student.edu', 'bcrypt_hash', 'student', true),
-('Admin User', 'admin@nm-ride.com', 'bcrypt_hash', 'admin', true);
+('Admin User', 'admin@campusride.com', 'bcrypt_hash', 'admin', true);
 ```
 
 ### Drivers (PENDING)
@@ -153,9 +153,9 @@ INSERT INTO drivers (
     vehicle_details, service_area, verification_status,
     is_active, is_available
 ) VALUES
-('Suresh Pawar', '9876543210', 'suresh@nm-ride.com', 'bcrypt_hash',
+('Suresh Pawar', '9876543210', 'suresh@campusride.com', 'bcrypt_hash',
  'auto', 'MH-15 AG 1234', 'Nashik Road', 'PENDING', false, false),
-('Raj Kumar', '9234567890', 'raj@nm-ride.com', 'bcrypt_hash',
+('Raj Kumar', '9234567890', 'raj@campusride.com', 'bcrypt_hash',
  'bike', 'MH-02 AB 5678', 'Pune Road', 'PENDING', false, false);
 ```
 
@@ -163,11 +163,11 @@ INSERT INTO drivers (
 
 ```sql
 INSERT INTO users (name, email, hashed_password, role)
-VALUES ('Admin', 'admin@nm-ride.com', 
+VALUES ('Admin', 'admin@campusride.com', 
         '$2b$12$...[bcrypt_hash]...', 'admin');
 ```
 
-Credentials: `admin@nm-ride.com` / `Admin@123`
+Credentials: `admin@campusride.com` / `Admin@123`
 
 ---
 
@@ -273,20 +273,20 @@ LEFT JOIN ratings r ON TRUE;
 
 ```bash
 # Full backup
-pg_dump -U postgres nmride > nmride_backup.sql
+pg_dump -U postgres campusride > campusride_backup.sql
 
 # Compressed backup
-pg_dump -U postgres nmride | gzip > nmride_backup.sql.gz
+pg_dump -U postgres campusride | gzip > campusride_backup.sql.gz
 ```
 
 ### Restore
 
 ```bash
 # From SQL file
-psql -U postgres -d nmride -f nmride_backup.sql
+psql -U postgres -d campusride -f campusride_backup.sql
 
 # From compressed file
-gunzip -c nmride_backup.sql.gz | psql -U postgres -d nmride
+gunzip -c campusride_backup.sql.gz | psql -U postgres -d campusride
 ```
 
 ---

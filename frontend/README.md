@@ -1,6 +1,6 @@
-# NM-Ride Frontend
+# CampusRide Frontend
 
-React + TypeScript + Vite frontend for the NM-Ride shared transport and ride-sharing management application.
+React + TypeScript + Vite frontend for the CampusRide shared transport and ride-sharing management application.
 
 ## Features
 
@@ -17,7 +17,7 @@ React + TypeScript + Vite frontend for the NM-Ride shared transport and ride-sha
 ### Prerequisites
 
 - Node.js 18+ and npm or bun
-- Running NM-Ride backend on http://localhost:8000
+- Running CampusRide backend on http://localhost:8000
 
 ### Installation
 
