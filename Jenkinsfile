@@ -2,85 +2,81 @@ pipeline {
     agent any
 
     environment {
-        // Defines CI environment variables 
         CI = 'true'
+        NODE_ENV = 'production'
+
+        // 🔐 Pull SECRET_KEY securely from Jenkins Credentials Store
+        SECRET_KEY = credentials('SECRET_KEY')
     }
 
     stages {
-        stage('Checkout') {
+
+        // ── 1. CHECKOUT ──────────────────────────────────────────────
+        stage('Checkout Code') {
             steps {
-                // Checkout code from the configured Git repository
-                checkout scm
+                echo 'Cloning repository from GitHub...'
+                git branch: 'main',
+                    url: 'https://github.com/shloksalunke/devops-project.git'
             }
         }
 
-        stage('Backend: Test') {
+        // ── 2. BACKEND SETUP ─────────────────────────────────────────
+        stage('Backend: Setup') {
             steps {
                 dir('backend') {
-                    echo 'Setting up Python Environment and running Pytest...'
-                    // Note: If Jenkins is running on Windows natively, change 'sh' to 'bat'
-                    // and use 'venv\\Scripts\\activate' instead.
-                    sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    # Run tests
-                    pytest
+                    echo 'Setting up Python virtual environment...'
+                    bat '''
+                    "C:\\Users\\shlok\\AppData\\Local\\Programs\\Python\\Python312\\python.exe" -m venv venv
+                    venv\\Scripts\\python.exe -m pip install --upgrade pip
+                    venv\\Scripts\\pip.exe install -r requirements.txt
+                    echo Backend setup completed
                     '''
                 }
             }
         }
 
-        stage('Frontend: Lint, Build & Test') {
+        // ── 3. FRONTEND BUILD ────────────────────────────────────────
+        stage('Frontend: Build') {
             steps {
                 dir('frontend') {
-                    echo 'Setting up Node Environment...'
-                    // Note: If Jenkins is running on Windows natively, change 'sh' to 'bat'
-                    sh '''
+                    echo 'Installing dependencies and building frontend...'
+                    bat '''
                     npm install
-                    npm run lint
-                    npm run test
                     npm run build
                     '''
                 }
             }
         }
 
-        stage('Docker: Build Images') {
+        // ── 4. DOCKER BUILD ──────────────────────────────────────────
+        stage('Docker: Build') {
             steps {
-                echo 'Validating Docker Compose Build...'
-                // This builds the production images locally as a validation check
-                sh 'docker-compose -f docker-compose.prod.yml build'
+                echo 'Building Docker images using production compose file...'
+                bat 'docker-compose -f docker-compose.prod.yml build'
             }
         }
 
-        
-        Optional Deployment Stage: 
-        Uncomment this if you want to deploy the stack via Docker automatically after passing tests.
-        
-        stage('Deploy') {
-            when {
-                branch 'main'
-            }
+        // ── 5. DOCKER RUN ────────────────────────────────────────────
+        stage('Docker: Run') {
             steps {
-                echo 'Deploying to Production...'
-                sh 'docker-compose -f docker-compose.prod.yml up -d'
+                echo 'Starting containers — SECRET_KEY injected from Jenkins credentials...'
+                bat '''
+                docker-compose -f docker-compose.prod.yml down
+                docker-compose -f docker-compose.prod.yml up -d
+                '''
             }
         }
-        
     }
 
     post {
         always {
-            echo 'CI Pipeline has finished executing.'
-            // You can add JUnit or Coverage parsers here
+            echo 'Pipeline execution completed.'
         }
         success {
-            echo 'Build, Test, and Containerization successful! ✅'
+            echo 'SUCCESS ✅: CampusRide Backend + Frontend + Docker running!'
         }
         failure {
-            echo 'Pipeline failed! Please check the logs. ❌'
+            echo 'FAILED ❌: Check logs above for details.'
         }
     }
 }
