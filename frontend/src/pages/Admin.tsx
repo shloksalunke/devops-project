@@ -14,20 +14,20 @@ const Admin: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToastNotify();
-  
+
   // Tabs and UI state
   const [tab, setTab] = useState<Tab>('dashboard');
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [docViewerOpen, setDocViewerOpen] = useState(false);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
-  
+
   // Data states
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [pendingDrivers, setPendingDrivers] = useState<PendingDriver[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<PendingDriver | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
-  
+
   // Form states
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [form, setForm] = useState<CreateDriverPayload>({
@@ -36,7 +36,7 @@ const Admin: React.FC = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [approvalNotes, setApprovalNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  
+
   // Load data
   useEffect(() => {
     const fetch = async () => {
@@ -167,12 +167,12 @@ const Admin: React.FC = () => {
           }
         }
       );
-      
+
       if (!response.ok) {
         showToast('Failed to download document', 'error');
         return;
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -216,9 +216,8 @@ const Admin: React.FC = () => {
             <div key={l.key} className="relative">
               <button
                 onClick={() => setTab(l.key)}
-                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150 ${
-                  tab === l.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary'
-                }`}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150 ${tab === l.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary'
+                  }`}
               >
                 {l.icon}
                 <span className="flex-1 text-left">{l.label}</span>
@@ -515,7 +514,7 @@ const Admin: React.FC = () => {
                       'INSURANCE': '🛡️'
                     };
                     const icon = docTypeIcons[doc.document_type] || '📄';
-                    
+
                     return (
                       <div key={doc.id} className="rounded-lg border border-border bg-card p-3 hover:bg-secondary/50 transition">
                         <div className="flex items-start justify-between gap-2">
@@ -535,14 +534,13 @@ const Admin: React.FC = () => {
                             >
                               {doc.file_type === 'pdf' ? <Eye size={14} /> : <Download size={14} />}
                             </button>
-                            <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium flex-shrink-0 whitespace-nowrap ${
-                              doc.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                            <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium flex-shrink-0 whitespace-nowrap ${doc.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
                               doc.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {doc.status === 'APPROVED' ? '✓' : 
-                               doc.status === 'REJECTED' ? '✗' : 
-                               '⏳'}
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                              {doc.status === 'APPROVED' ? '✓' :
+                                doc.status === 'REJECTED' ? '✗' :
+                                  '⏳'}
                             </span>
                           </div>
                         </div>

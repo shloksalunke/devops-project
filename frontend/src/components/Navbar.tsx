@@ -34,8 +34,8 @@ const Navbar: React.FC = () => {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2 text-lg font-bold text-foreground">
-          <Bus size={22} className="text-accent" />
-          CampusRide
+            <Bus size={22} className="text-accent" />
+            CampusRide
           </Link>
           {/* Quick nav links based on role */}
           {user?.role === 'admin' && (

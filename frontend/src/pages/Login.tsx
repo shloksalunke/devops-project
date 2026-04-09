@@ -32,7 +32,7 @@ const Login: React.FC = () => {
       // Get the user data to check role
       const userRes = await authApi.getMe();
       const userRole = userRes.data.role;
-      
+
       // Redirect based on role
       if (userRole === 'admin') {
         navigate('/admin');
@@ -96,14 +96,14 @@ const Login: React.FC = () => {
         {/* Demo Credentials */}
         <div className="mt-6 space-y-3 rounded-lg border border-border bg-secondary/30 p-3">
           <p className="text-xs font-semibold text-foreground">Demo Credentials</p>
-          
+
           {/* Student */}
           <div className="text-xs">
             <p className="font-medium text-foreground">👤 Student</p>
             <p className="text-muted-foreground">Email: <span className="font-mono">aarav@student.edu</span></p>
             <p className="text-muted-foreground">Pass: <span className="font-mono">Student@123</span></p>
           </div>
-          
+
           {/* Admin */}
           <div className="border-t border-border pt-2">
             <p className="font-medium text-foreground">🔐 Admin</p>
