@@ -77,6 +77,14 @@ pipeline {
                 '''
             }
         }
+
+        // ── 7. DB SEED ───────────────────────────────────────────────
+        stage('Docker: Seed DB') {
+            steps {
+                echo 'Seeding database with admin and sample data...'
+                bat 'docker-compose -f docker-compose.prod.yml exec -T api python scripts/seed.py'
+            }
+        }
     }
 
     post {
