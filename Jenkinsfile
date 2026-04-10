@@ -61,8 +61,19 @@ pipeline {
             steps {
                 echo 'Starting containers — SECRET_KEY injected from Jenkins credentials...'
                 bat '''
-                docker-compose -f docker-compose.prod.yml down
+                docker-compose -f docker-compose.prod.yml down --volumes
                 docker-compose -f docker-compose.prod.yml up -d
+                '''
+            }
+        }
+
+        // ── 6. DB MIGRATION ──────────────────────────────────────────
+        stage('Docker: Migrate DB') {
+            steps {
+                echo 'Running Alembic migrations on fresh database...'
+                bat '''
+                timeout /t 10 /nobreak
+                docker-compose -f docker-compose.prod.yml exec -T api alembic upgrade head
                 '''
             }
         }
