@@ -72,7 +72,7 @@ pipeline {
             steps {
                 echo 'Running Alembic migrations on fresh database...'
                 bat '''
-                timeout /t 10 /nobreak
+                ping 127.0.0.1 -n 12 > nul
                 docker-compose -f docker-compose.prod.yml exec -T api alembic upgrade head
                 '''
             }
